@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang=it>
+	<head>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="author" content="Mattia Guarino">
+		<meta name="description" content="gioco pallina">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js"> </script>
+        <title>gioco pallina</title>
+		
+		<style>
+			html, body {
+			margin: 0;
+			padding: 0;
+			}
+			
+			canvas{
+			display: block;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<script>
+			//inserisco la variabile tasto
+			let tasto;
+			// coordinata X delle palline
+			let PallinaX = [];
+			// coordinata Y delle palline
+			let PallinaY = [];
+			// indice dell'array
+			let i;
+			//coordinata rettangolo x
+			let coordinataRectX;
+			//inserisco il punteggio
+			let score=0;
+			//diametro pallina
+			let diametro=70;
+			
+			function setup() {
+				//con un ciclo for e la funzione math.random faccio in modo che venga inserita una coordinata y casuale per le 10 palline moltiplicato per -1500 in modo che vengano messe in posizioni differenti che variano in altezz da 1 a -1500 cosi da rendere la discesa abbastanza equilibrata
+				for(i=0;i<10;i++) {
+                    PallinaY[i]=Math.random() *-1500;
+					
+				}
+				
+				//la stessa cosa fatta con la coordinata x l'ho fatta con la coordinata y per le 10 palline stavolta moltiplicato per 1350 in modo che vengano inserite all'interno dell'area da disegno
+				for(i=0;i<10;i++) {
+                    PallinaX[i]=Math.random() *890;
+					
+				}
+				//creo l'area da disegno
+				createCanvas(900, 600);
+				
+				
+				
+			}
+			
+			function draw() {
+				background(255,0,0);
+				tasto=key;
+				if(tasto==""){
+				tasto="m";
+				}
+				switch(tasto){
+					case "g":
+					//disegno le palline in un ciclo for 
+					for(i=0;i<10;i++) {
+						fill(255,255,255);
+						strokeWeight(5);
+						circle(PallinaX[i],PallinaY[i],diametro);
+						
+					}
+					
+					//aumento la coordinataY della pallina di 1 ogni volta per farla cadere verso il basso
+					for(i=0;i<10;i++) {
+						PallinaY[i]=PallinaY[i]+3;
+						
+						
+					}
+					//faccio in modo da poter muovere la racchetta da destra a sinistra
+					coordinataRectX = mouseX-80;
+					//se coordinata x dell'angolo in alto a sinistra del rettangolo (coordinataRectX) è <=0 allora coordinataRectX assume valore 0 in modo che non superi l'area da disegno
+					if (coordinataRectX <= 0) {
+						coordinataRectX = 0;
+					}
+					//se coordinata y dell'angolo in alto a sinistra della racchetta (coordinataRectX) è >=730 allora coordinataRectX assume valore 730
+					if (coordinataRectX >= 730) {
+						coordinataRectX = 730;
+						
+					}
+					//inserisco la condizione per far si che la pallina una volta toccato il rettangolo venga cambiata di posizione e portata in una coordinata casuale da 1a-1500 per la coordinata Y, e da 1 a 890 per la X, poi aumento il punteggio ogni volta che una pallina viene toccata dalla racchetta. La condizione ripetuta per tutti gli elementi dell'array.
+					for(i=0;i<10;i++) {
+						if(PallinaY[i]>=525 && PallinaY[i]<=575){
+							if(PallinaX[i]<coordinataRectX+205 && PallinaX[i]>coordinataRectX-25 ){
+								PallinaY[i]=Math.random() *-1500;
+								PallinaX[i]=Math.random()*890;
+								score++;
+								
+							}
+						}
+					}
+					//faccio in modo che se le palline cadono oltre il rettangolo vengano rigenerate con una coordinata y ed x casuale per non terminare il gioco.
+					for(i=0;i<10;i++) {
+						if(PallinaY[i]>610){
+							PallinaY[i]=Math.random() *-500;
+							PallinaX[i]=Math.random() *830;
+							score--;
+						}
+					}
+					//creo la condizione all'interno di un ciclo for che serve per fare in modo che quando il punteggio sarà maggiore di 20, il gioco finisce con la vittoria.
+					for(i=0;i<10;i++) {
+						if(score>20){
+							PallinaY[i]=-50;
+							textSize(50);
+							text("congratulazioni, hai vinto",180,250);
+						}
+					}
+					for(i=0;i<10;i++) {
+						if(score<-20){
+							PallinaY[i]=-50;
+							textSize(50);
+							text("oh no, hai perso",250,250);
+						}
+					}
+					//creo il rettangolo (racchetta)
+					strokeWeight(10);
+					fill(255,255,255);
+					rect(coordinataRectX,550,170,30);
+					//coloro il rettangolo
+					fill(255,255,255);
+					//grandezza dello score 
+					textSize(20);
+					text("Score: " + score, 800, 25);
+					break;
+					//caso p cioè la pausa
+					case "p":
+					//coloro la scritta della pausa e gli do una grandezza
+					fill(255,255,255);
+					textSize(50);
+					text("il gioco è in pausa",250,300);
+					
+					break;
+					//caso m che sarebbe il menù
+					case "m":
+					//scrivo e coloro tutte le aggiunte del menù
+					textSize(40);
+					text("colpisci la palla!",290,100);
+					fill(255,255,255);
+					textSize(50);
+					text("seleziona g per giocare e p per la pausa",1,200);
+					text("esci",390,510);
+					text("non far cadere le palline e ottieni punti",20,300);
+					text("totalizza un punteggio di 20 per vincere",15,400);
+					textSize(30);
+					text("(se il tuo punteggio sarà minore di venti perderai)",130,450);
+
+					break;		
+				}
+			}
+		</script>
+	</body>
+</html>
